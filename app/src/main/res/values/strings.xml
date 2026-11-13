@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pivot</string>
+    <string name="tile_label">Pivot</string>
+    <string name="channel_name">Orientation controls</string>
+    <string name="channel_desc">Quick buttons to change the screen orientation</string>
+</resources>
