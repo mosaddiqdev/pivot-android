@@ -1,6 +1,8 @@
 package app.pivot.orientation.service
 
 import android.app.PendingIntent
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
@@ -15,6 +17,9 @@ class PivotTile : TileService() {
 
     override fun onStartListening() {
         PivotStore.init(this)
+        // Opening the panel is a chance to bring back a service Android stopped.
+        val s = PivotStore.state.value
+        if (s.mode != Mode.AUTO && !PivotService.running) PivotController.sync(this)
         refresh()
     }
 
@@ -28,16 +33,20 @@ class PivotTile : TileService() {
         val cycle = s.shortcuts
         val index = cycle.indexOf(s.mode)
         val next = cycle[(index + 1).mod(cycle.size)]
-        PivotController.setMode(this, next)
+        PivotStore.update { it.copy(mode = next) }
+        // If Android will not let a background tile start the service, open the app instead.
+        // The app is allowed to start it and does so as soon as it is shown.
+        if (!PivotController.sync(this)) openApp()
         refresh()
     }
 
     private fun refresh() {
         val tile = qsTile ?: return
         val mode = PivotStore.state.value.mode
+        val stalled = mode != Mode.AUTO && !PivotService.running
         tile.state = if (mode == Mode.AUTO) Tile.STATE_INACTIVE else Tile.STATE_ACTIVE
         tile.label = "Pivot"
-        if (Build.VERSION.SDK_INT >= 29) tile.subtitle = mode.title
+        if (Build.VERSION.SDK_INT >= 29) tile.subtitle = if (stalled) "${mode.title} · tap to resume" else mode.title
         tile.updateTile()
     }
 
@@ -49,6 +58,15 @@ class PivotTile : TileService() {
             startActivityAndCollapse(pending)
         } else {
             startActivityAndCollapse(intent)
+        }
+    }
+
+    companion object {
+        /** Asks Android to refresh the tile, so it follows changes made from the app or notification. */
+        fun requestRefresh(context: Context) {
+            runCatching {
+                requestListeningState(context, ComponentName(context, PivotTile::class.java))
+            }
         }
     }
 }

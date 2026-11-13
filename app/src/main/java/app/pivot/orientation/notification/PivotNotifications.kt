@@ -13,6 +13,7 @@ import app.pivot.orientation.R
 import app.pivot.orientation.data.PivotState
 import app.pivot.orientation.model.Mode
 import app.pivot.orientation.model.Side
+import app.pivot.orientation.service.NotificationDismissReceiver
 import app.pivot.orientation.service.PivotService
 
 /**
@@ -66,13 +67,23 @@ object PivotNotifications {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setColor(0xFFF5F5F6.toInt())
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+            .setDeleteIntent(
+                PendingIntent.getBroadcast(
+                    context,
+                    2,
+                    Intent(context, NotificationDismissReceiver::class.java),
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                ),
+            )
 
         state.shortcuts.forEach { mode ->
             val label = if (mode == state.mode) "${mode.title} ✓" else mode.title
             val intent = Intent(context, PivotService::class.java)
                 .setAction(PivotService.ACTION_SET)
                 .putExtra(PivotService.EXTRA_MODE, mode.id)
-            val pending = PendingIntent.getService(
+            // getForegroundService, not getService: the button must work even when the
+            // process was stopped and Android has to start the service again.
+            val pending = PendingIntent.getForegroundService(
                 context,
                 100 + mode.ordinal,
                 intent,
@@ -81,6 +92,12 @@ object PivotNotifications {
             builder.addAction(0, label, pending)
         }
         return builder.build()
+    }
+
+    /** Updates (or puts back) the notification of the running service. */
+    fun post(context: Context, state: PivotState, overlayGranted: Boolean) {
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.notify(NOTIFICATION_ID, build(context, state, overlayGranted))
     }
 
     fun cancel(context: Context) {

@@ -6,6 +6,7 @@ import app.pivot.orientation.model.Mode
 import app.pivot.orientation.model.Side
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.util.concurrent.CopyOnWriteArraySet
 
 data class PivotState(
     val mode: Mode = Mode.AUTO,
@@ -26,6 +27,14 @@ object PivotStore {
     private val _state = MutableStateFlow(PivotState())
     val state: StateFlow<PivotState> get() = _state
 
+    private val listeners = CopyOnWriteArraySet<(PivotState) -> Unit>()
+
+    /** Calls [onChange] after every stored change. Returns a function that stops listening. */
+    fun observe(onChange: (PivotState) -> Unit): () -> Unit {
+        listeners.add(onChange)
+        return { listeners.remove(onChange) }
+    }
+
     @Synchronized
     fun init(context: Context) {
         if (::prefs.isInitialized) return
@@ -39,6 +48,7 @@ object PivotStore {
         if (next == _state.value) return
         _state.value = next
         write(next)
+        listeners.forEach { it(next) }
     }
 
     private fun read(): PivotState {

@@ -16,19 +16,27 @@ object PivotController {
         sync(context)
     }
 
-    /** Re-applies the stored state. Starts the service only when something needs it. */
-    fun sync(context: Context) {
+    /**
+     * Re-applies the stored state. Starts the service only when something needs it.
+     *
+     * Returns false when Android refused to start the service (for example because the app
+     * is in the background and has no start exemption). The stored state is kept, and the
+     * caller can fall back to opening the app, which is always allowed to start it.
+     */
+    fun sync(context: Context): Boolean {
         PivotStore.init(context)
         val s = PivotStore.state.value
         val needed = s.mode != Mode.AUTO || s.keepNotification || PivotService.running
-        if (!needed) return
+        if (!needed) return true
         val intent = Intent(context, PivotService::class.java).setAction(PivotService.ACTION_SYNC)
-        try {
+        return try {
             ContextCompat.startForegroundService(context, intent)
-        } catch (t: Throwable) {
-            // Background start can be refused by the system. The stored state is kept
-            // and applied the next time the app or the notification is used.
+            PivotService.lastStartFailure = null
+            true
+        } catch (t: Exception) {
             Log.w("PivotController", "Could not start service", t)
+            PivotService.lastStartFailure = t.javaClass.simpleName
+            false
         }
     }
 }
