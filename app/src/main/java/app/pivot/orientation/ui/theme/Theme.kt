@@ -1,96 +1,88 @@
 package app.pivot.orientation.ui.theme
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import android.os.Build
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 
-/**
- * Charcoal monochrome tokens named after the shadcn/ui set so the mapping is obvious.
- * Semantic hues (success, warning, destructive, info) are reserved for status only.
- */
-@Immutable
-data class PivotColors(
-    val background: Color,
-    val foreground: Color,
-    val card: Color,
-    val popover: Color,
-    val primary: Color,
-    val primaryForeground: Color,
-    val secondary: Color,
-    val muted: Color,
-    val mutedForeground: Color,
-    val accent: Color,
-    val border: Color,
-    val input: Color,
-    val ring: Color,
-    val success: Color,
-    val warning: Color,
-    val destructive: Color,
-    val info: Color,
+// Fallback palette for phones without Material You (Android 11 and older). Indigo seed.
+private val LightColors = lightColorScheme(
+    primary = Color(0xFF4355B9),
+    onPrimary = Color(0xFFFFFFFF),
+    primaryContainer = Color(0xFFDDE1FF),
+    onPrimaryContainer = Color(0xFF00105C),
+    secondary = Color(0xFF5A5D72),
+    onSecondary = Color(0xFFFFFFFF),
+    secondaryContainer = Color(0xFFDFE1F9),
+    onSecondaryContainer = Color(0xFF171B2C),
+    tertiary = Color(0xFF75546F),
+    onTertiary = Color(0xFFFFFFFF),
+    tertiaryContainer = Color(0xFFFFD7F5),
+    onTertiaryContainer = Color(0xFF2C122A),
+    background = Color(0xFFFEFBFF),
+    onBackground = Color(0xFF1B1B1F),
+    surface = Color(0xFFFEFBFF),
+    onSurface = Color(0xFF1B1B1F),
+    surfaceVariant = Color(0xFFE3E1EC),
+    onSurfaceVariant = Color(0xFF46464F),
+    outline = Color(0xFF767680),
+    outlineVariant = Color(0xFFC7C5D0),
+    surfaceContainerLowest = Color(0xFFFFFFFF),
+    surfaceContainerLow = Color(0xFFF7F5FA),
+    surfaceContainer = Color(0xFFF1EFF4),
+    surfaceContainerHigh = Color(0xFFEBE9EF),
+    surfaceContainerHighest = Color(0xFFE5E3E9),
 )
 
-private val CharcoalDark = PivotColors(
-    background = Color(0xFF0D0D0F),
-    foreground = Color(0xFFF5F5F6),
-    card = Color(0xFF141416),
-    popover = Color(0xFF1A1A1D),
-    primary = Color(0xFFF5F5F6),
-    primaryForeground = Color(0xFF151517),
-    secondary = Color(0xFF212125),
-    muted = Color(0xFF1B1B1E),
-    mutedForeground = Color(0xFF9D9DA6),
-    accent = Color(0xFF26262A),
-    border = Color(0xFF2C2C31),
-    input = Color(0xFF3A3A41),
-    ring = Color(0xFF8A8A94),
-    success = Color(0xFF3FCF8E),
-    warning = Color(0xFFF2B24C),
-    destructive = Color(0xFFF26B6B),
-    info = Color(0xFF6CA9FF),
+private val DarkColors = darkColorScheme(
+    primary = Color(0xFFBAC3FF),
+    onPrimary = Color(0xFF08218A),
+    primaryContainer = Color(0xFF293CA0),
+    onPrimaryContainer = Color(0xFFDDE1FF),
+    secondary = Color(0xFFC3C5DD),
+    onSecondary = Color(0xFF2C2F42),
+    secondaryContainer = Color(0xFF424659),
+    onSecondaryContainer = Color(0xFFDFE1F9),
+    tertiary = Color(0xFFE4BAD9),
+    onTertiary = Color(0xFF43273F),
+    tertiaryContainer = Color(0xFF5C3D57),
+    onTertiaryContainer = Color(0xFFFFD7F5),
+    background = Color(0xFF1B1B1F),
+    onBackground = Color(0xFFE4E1E6),
+    surface = Color(0xFF1B1B1F),
+    onSurface = Color(0xFFE4E1E6),
+    surfaceVariant = Color(0xFF46464F),
+    onSurfaceVariant = Color(0xFFC7C5D0),
+    outline = Color(0xFF90909A),
+    outlineVariant = Color(0xFF46464F),
+    surfaceContainerLowest = Color(0xFF16161A),
+    surfaceContainerLow = Color(0xFF1F1F23),
+    surfaceContainer = Color(0xFF232327),
+    surfaceContainerHigh = Color(0xFF2A2A2E),
+    surfaceContainerHighest = Color(0xFF353539),
 )
-
-@Immutable
-class PivotTypography {
-    private val sans = FontFamily.SansSerif
-
-    val display = TextStyle(fontFamily = sans, fontSize = 30.sp, lineHeight = 34.sp, fontWeight = FontWeight.SemiBold, letterSpacing = (-0.8).sp)
-    val title = TextStyle(fontFamily = sans, fontSize = 20.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold, letterSpacing = (-0.3).sp)
-    val heading = TextStyle(fontFamily = sans, fontSize = 15.sp, lineHeight = 20.sp, fontWeight = FontWeight.Medium, letterSpacing = (-0.1).sp)
-    val body = TextStyle(fontFamily = sans, fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.Normal)
-    val small = TextStyle(fontFamily = sans, fontSize = 12.5.sp, lineHeight = 18.sp, fontWeight = FontWeight.Normal)
-    val label = TextStyle(fontFamily = sans, fontSize = 11.sp, lineHeight = 14.sp, fontWeight = FontWeight.Medium, letterSpacing = 0.7.sp)
-}
-
-private val LocalPivotColors = staticCompositionLocalOf { CharcoalDark }
-private val LocalPivotTypography = staticCompositionLocalOf { PivotTypography() }
-
-object Pivot {
-    val colors: PivotColors
-        @Composable @ReadOnlyComposable get() = LocalPivotColors.current
-
-    val type: PivotTypography
-        @Composable @ReadOnlyComposable get() = LocalPivotTypography.current
-}
 
 @Composable
-fun PivotTheme(content: @Composable () -> Unit) {
-    CompositionLocalProvider(
-        LocalPivotColors provides CharcoalDark,
-        LocalPivotTypography provides PivotTypography(),
-    ) {
-        Box(Modifier.fillMaxSize().background(CharcoalDark.background)) {
-            content()
-        }
+fun PivotTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit,
+) {
+    val context = LocalContext.current
+    val colors = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        darkTheme -> DarkColors
+        else -> LightColors
     }
+    MaterialTheme(colorScheme = colors, content = content)
 }
+
+/** Green used only for "this is fine" status marks. Always paired with an icon and text. */
+@Composable
+fun okColor(): Color = if (isSystemInDarkTheme()) Color(0xFF6DD58C) else Color(0xFF1B873F)

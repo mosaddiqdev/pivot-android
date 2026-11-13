@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Pivot" parent="android:Theme.Material.NoActionBar">
-        <item name="android:windowBackground">@color/charcoal</item>
-        <item name="android:colorBackground">@color/charcoal</item>
+    <style name="Theme.Pivot" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/window_bg</item>
+        <item name="android:colorBackground">@color/window_bg</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowSplashScreenBackground">@color/charcoal</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowSplashScreenBackground">@color/window_bg</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/splash_icon_bg</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
     </style>
 </resources>
